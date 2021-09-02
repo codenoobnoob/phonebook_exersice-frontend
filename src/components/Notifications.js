@@ -8,8 +8,6 @@ const NotificationMessage = ({ props }) => {
     isError: false,
   });
 
-  console.log("notification rendered\nMessage: '" + message.message + "'");
-
   const errorMessage = (newMessage, newIsError) => {
     if (message) {
       clearTimeout();

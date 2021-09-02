@@ -31,77 +31,58 @@ const App = () => {
 
   const addName = (e) => {
     e.preventDefault();
-    if (newName.length < 3 || newNumber.length < 3) {
-      setNotificationMessage(
-        "The entered values are not allowed. must contain at least three characters",
-        true,
-        5000
-      );
-    } else {
-      const indexOfExisting = people
-        .map((person) => person.name)
-        .indexOf(newName);
-      if (indexOfExisting !== -1) {
-        if (
-          window.confirm(
-            `${newName} is aleady added to phonebook, replace the old number with the new one?`
-          )
-        ) {
-          const updatedNumber = {
-            number: newNumber,
-          };
-          personService
-            .updateData(people[indexOfExisting].id, updatedNumber)
-            .then((returnedPerson) => {
-              console.log(returnedPerson);
-              setPeople(
-                people.map((person) =>
-                  person.id !== people[indexOfExisting].id
-                    ? person
-                    : returnedPerson
-                )
-              );
-              setNotificationMessage(
-                `${newName} phone number was changed`,
-                false,
-                5000
-              );
-            })
-            .catch((error) => {
-              setNotificationMessage(
-                "error while trying to update person",
-                true,
-                5000
-              );
-            });
-        }
-      } else {
-        const newPerson = {
-          name: newName,
-          number: newNumber,
-        };
+    const indexOfExisting = people // Can I implement this some other way???
+      .map((person) => person.name)
+      .indexOf(newName);
+    if (indexOfExisting !== -1) {
+      if (
+        window.confirm(
+          `${newName} is aleady added to phonebook, replace the old number with the new one?`
+        )
+      ) {
         personService
-          .addData(newPerson)
+          .updateData(people[indexOfExisting].id, { number: newNumber })
           .then((returnedPerson) => {
             console.log(returnedPerson);
-            setPeople(people.concat(returnedPerson));
+            setPeople(
+              people.map((person) =>
+                person.id !== people[indexOfExisting].id
+                  ? person
+                  : returnedPerson
+              )
+            );
             setNotificationMessage(
-              `${newName} added to phonebook`,
+              `${newName} phone number was changed`,
               false,
               5000
             );
           })
           .catch((error) => {
             setNotificationMessage(
-              "error while trying to add person",
+              "error while trying to update person",
               true,
               5000
             );
           });
       }
-      setNewName("");
-      setNewNumber("");
+    } else {
+      const newPerson = {
+        name: newName,
+        number: newNumber,
+      };
+      personService
+        .addData(newPerson)
+        .then((returnedPerson) => {
+          console.log(returnedPerson);
+          setPeople(people.concat(returnedPerson));
+          setNotificationMessage(`${newName} added to phonebook`, false, 5000);
+        })
+        .catch((error) => {
+          setNotificationMessage(error.response.data.error, true, 5000);
+        });
     }
+    setNewName("");
+    setNewNumber("");
   };
   const handleNameChange = (e) => {
     e.preventDefault();
@@ -123,7 +104,6 @@ const App = () => {
         `Are you sure you want to delete ${e.target.dataset.fullname}`
       )
     ) {
-      //poistaa väärän henkilön, aina ensimmäinen listassa.
       personService
         .removeData(e.target.id)
         .then((response) => {
