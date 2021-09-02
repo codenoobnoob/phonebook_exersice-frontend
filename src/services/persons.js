@@ -5,7 +5,6 @@ const getData = () => axios.get(baseUrl).then((response) => response.data);
 
 const addData = (newData) =>
   axios.post(baseUrl, newData).then((response) => {
-    console.log(response.data);
     return response.data;
   });
 
